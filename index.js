@@ -23,12 +23,13 @@ async function main () {
     done()
   })
 
-  app.listen(config.app.port, '0.0.0.0', (err) => {
-    if (err) {
-      app.log.fatal({ msg: 'error starting app', err })
-      process.exit(1)
-    }
-  })
+  try {
+    await app.listen({ port: config.app.port, host: '0.0.0.0' })
+    logger.info('ready!')
+  } catch (err) {
+    app.log.fatal({ msg: 'error starting app', err })
+    process.exit(1)
+  }
 }
 
 main()

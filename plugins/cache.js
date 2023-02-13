@@ -121,7 +121,7 @@ module.exports = fp(async (app, options) => {
     gcIntervalLazy = setInterval(async () => {
       // note gc function does not throw on error
       app.log.info({ msg: 'running garbage collector (lazy)' })
-      const report = await storage.gc('lazy', { lazy: { chunk: options.cache.gc.lazyChunk, cursor }})
+      const report = await storage.gc('lazy', { lazy: { chunk: options.cache.gc.lazyChunk, cursor } })
       if (report.error) {
         app.log.error({ msg: 'error running gc', mode: 'lazy', report })
         return

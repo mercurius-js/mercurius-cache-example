@@ -36,7 +36,7 @@ const logger = {
 }
 const redis = new Redis(config.redis)
 
-async function request(query) {
+async function request (query) {
   const { body } = await undici.request('http://localhost:3000/graphql', {
     method: 'POST',
     headers: {
@@ -49,7 +49,7 @@ async function request(query) {
 
 let app, monitor
 
-async function start() {
+async function start () {
   await redis.flushall()
 
   monitor = await redis.monitor()
@@ -62,7 +62,7 @@ async function start() {
   await app.listen(config.app.port, '0.0.0.0')
 }
 
-async function end() {
+async function end () {
   await app.close()
   monitor.removeAllListeners()
   await redis.disconnect()
@@ -74,68 +74,68 @@ async function end() {
 const requests = [
   {
     title: 'dedupe the same request not cached, called first time',
-    queries: Array(5).fill('{ users(page: 1) {name, groups { id }} }'),
+    queries: Array(5).fill('{ users(page: 1) {name, groups { id }} }')
   },
 
   {
     title: 'dedupe the same request cached',
-    queries: Array(5).fill('{ users(page: 1) {name, groups { id }} }'),
+    queries: Array(5).fill('{ users(page: 1) {name, groups { id }} }')
   },
 
   {
     title: 'cache users page 2',
-    queries: ['{ users(page: 2) {name, groups { id }} }'],
+    queries: ['{ users(page: 2) {name, groups { id }} }']
   },
 
   {
     title: 'use cache users on page 2',
-    queries: ['{ users(page: 2) {name, groups { id }} }'],
+    queries: ['{ users(page: 2) {name, groups { id }} }']
   },
 
   {
     title: 'cache countries',
-    queries: ['{ countries {id,name} }'],
+    queries: ['{ countries {id,name} }']
   },
 
   {
     title: 'get countries from cache',
-    queries: ['{ countries {id,name} }'],
+    queries: ['{ countries {id,name} }']
   },
 
   // nested
 
   {
     title: 'cache nested users',
-    queries: ['{ users(page: 3) {name,country {name},groups { id, name, users { id } } } }'],
+    queries: ['{ users(page: 3) {name,country {name},groups { id, name, users { id } } } }']
   },
 
   {
     title: 'get nested users from cache',
-    queries: ['{ users(page: 3) {name,country {name},groups { id, name, users { id } } } }'],
+    queries: ['{ users(page: 3) {name,country {name},groups { id, name, users { id } } } }']
   },
 
   // invalidation
 
   {
     title: 'update user 2 and invalidate cache where it\'s involved',
-    queries: ['mutation { updateUser(id: 2, user: { name: "Boris", country: "ru" }) {id, name, country {id}}}'],
+    queries: ['mutation { updateUser(id: 2, user: { name: "Boris", country: "ru" }) {id, name, country {id}}}']
   },
 
   {
     title: 'page 2 not be invalidated from previous user update so it\'s served from cache',
-    queries: ['{ users(page: 2) {name, groups { id }} }'],
+    queries: ['{ users(page: 2) {name, groups { id }} }']
   },
 
   {
     title: 'cache users pages',
-    queries: Array(3).fill(0).map((v, i) => `{ users(page: ${i + 1}) {name, groups { id }} }`),
+    queries: Array(3).fill(0).map((v, i) => `{ users(page: ${i + 1}) {name, groups { id }} }`)
   },
 
   {
     title: 'add a new user and invalidate all user pages',
     queries: [
       'mutation { addUser(user: { name: "John", country: "br" }) {id, name, country {id}}}'
-    ],
+    ]
   }
 ]
 
@@ -147,11 +147,11 @@ const filling = [
     queries: Array(3).fill(0).map((v, i) => `{ users(page: ${i + 1}) {name, groups { name }} }`)
       .concat(Array(3).fill(0).map((v, i) => `{ groups(page: ${i + 1}) {name, users { name }} }`))
       .concat(Array(9).fill(0).map((v, i) => `{ user(id: ${i + 1}) {name, groups {name}} }`))
-      .concat(Array(5).fill(0).map((v, i) => `{ group(id: ${i + 1}) {name, users {name}} }`)),
+      .concat(Array(5).fill(0).map((v, i) => `{ group(id: ${i + 1}) {name, users {name}} }`))
   }
 ]
 
-async function main() {
+async function main () {
   await start()
 
   for (const { title, queries } of requests) {
@@ -170,7 +170,7 @@ async function main() {
     await sleep(PACE)
   }
 
-  for (const mode of ['lazy', 'strict']) {
+  for (const _mode of ['lazy', 'strict']) {
     for (const { title, queries } of filling) {
       console.log(chalk.bold.bgWhite.blue(`*** ${title} ***`), '\n')
       console.log(chalk.yellow('query >>>', queries[0]))
@@ -193,4 +193,3 @@ async function main() {
 }
 
 main()
-
